@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="youtubeApp">
 <head>
   <meta charset="UTF-8">
   <title>YouTube Sync App</title>
@@ -21,7 +21,13 @@
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="./css/style.css">
 </head>
-<body>
+<body ng-controller="usersController as users">
+  <div ng-repeat="user in users.all">
+		<p>Username: {{ user.local.username }}</p>
+		<p>Full Name: {{ user.local.fullname }}</p>
+		<img ng-src="{{ user.local.image }}" width="250px" />
+		<p>Email: {{ user.local.email }}</p>
+	</div>
 
 </body>
 </html>
