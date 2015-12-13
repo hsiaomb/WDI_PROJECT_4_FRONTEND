@@ -13,6 +13,7 @@ function UsersController(User, TokenService, $scope) {
   self.user  = {};
 
   self.message = {};
+  self.video = {};
   self.messages = [];
 
   socket.on('message', function(msg) {
@@ -59,7 +60,12 @@ function UsersController(User, TokenService, $scope) {
 
   self.sendMessage = function() {
     socket.emit('message', self.message);
-  }
+  };
+
+  self.sendVideo = function(){
+    socket.emit('video', self.video);
+  };
+
 
   if(self.isLoggedIn()) {
     self.getUsers();
