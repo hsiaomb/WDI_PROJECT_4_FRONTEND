@@ -1,5 +1,4 @@
 <div id="player"></div>
-
 <ul id="messages">
   <li ng-repeat="message in users.messages track by $index">{{message}}</li>
 </ul>
@@ -9,7 +8,7 @@
   <button>Send</button>
 </form>
 
-<form ng-submit="users.sendVideo()">
+<form ng-submit="users.playVideo(users.video.id)">
   <input name="video" ng-model="users.video.id">
   <button>Send Video</button>
 </form>
