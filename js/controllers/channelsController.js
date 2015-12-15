@@ -1,6 +1,6 @@
 angular
-  .module('youtubeApp')
-  .controller('ChannelsController', ChannelsController);
+.module('youtubeApp')
+.controller('ChannelsController', ChannelsController);
 
 ChannelsController.$inject = ['Channel','$scope','$window', '$stateParams'];
 
@@ -13,6 +13,8 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
   self.messages = [];
   self.video = {};
   self.player = null;
+  // var playlistItem;
+  self.playlist = [];
   Channel.query(function(res){
     self.all = res.channels;
   });
@@ -21,7 +23,6 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
     Channel.get({ id: channelId }, function(res){
       self.selectedChannel = res;
       socket.emit('joinedRoom', $stateParams.channelId);
-      self.playVideo(res.channel.current_video);
     });
   };
 
@@ -52,6 +53,10 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
         console.log('Play Video');
         break;
         case 2:
+        self.playerAction("pauseVideo");
+        console.log('Pause Video');
+        break;
+        case 3:
         self.playerAction("pauseVideo");
         console.log('Pause Video');
         break;
@@ -145,4 +150,20 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
     });
   };
 
+  this.updatePlaylists = function(channelId){
+    Channel.get({ id: channelId }, function(res){
+      self.selectedChannel = res;
+      self.playlist = self.selectedChannel.channel.playlist;
+      self.playlist.push(self.playlistItem);
+      self.channel = {playlist: self.playlist};
+      Channel.update({id: channelId}, self.channel, function(res){
+        console.log(res);
+        self.playerAction('cueVideoById', {'videoId': 'bHQqvYy5KYo',
+        'startSeconds': 5
+      });
+    });
+    self.playlist = [];
+    self.playlistItem = '';
+  });
+};
 }

@@ -1,17 +1,34 @@
-<h1>{{channels.selectedChannel.channel.name}}</h1>
-<div id="player"></div>
-<ul id="messages">
-  <li ng-repeat="message in channels.messages track by $index">{{message}}</li>
-</ul>
+<div class="row">
+  <h3>{{channels.selectedChannel.channel.name}}</h3>
+  <div id="playerContainer">
+    <div id="player"></div>
+    <div id="playlist">
+      <table>
+        <tr ng-repeat="next in channels.selectedChannel.channel.playlist track by $index">
+          <td>{{next}}</td>
+        </tr>
+      </table>
+    </div>
+    <form id="newVid" ng-submit="channels.updatePlaylists(channels.selectedChannel.channel._id)">
+      <input name="playlist" placeholder="Video ID or Link" ng-model="channels.playlistItem">
+      <button>+</button>
+    </form>
+    <div id="chat">
+      <ul id="messages">
+        <li ng-repeat="message in channels.messages track by $index">{{message}}</li>
+      </ul>
+    </div>
+    <form id="chatMessage" ng-submit="channels.sendMessage()">
+      <input name="message" ng-model="channels.message.text">
+      <button>Send</button>
+    </form>
+  </div>
 
-<form ng-submit="channels.sendMessage()">
-  <input name="message" ng-model="channels.message.text">
-  <button>Send</button>
-</form>
+  <form ng-submit="channels.updateCurrentVideo(channels.selectedChannel.channel._id)">
+    <input name="video" ng-model="channels.channel.current_video">
+    <button>Send Video</button>
+  </form>
 
-<form ng-submit="channels.updateCurrentVideo()">
-  <input name="video" ng-model="channels.channel.current_video">
-  <button>Send Video</button>
-</form>
-
-<button ng-click="channels.leaveRoom(channels.selectedChannel.channel._id)"> Leave Room </button>
+  <button ng-click="channels.leaveRoom(channels.selectedChannel.channel._id)"> Leave Room </button>
+</div>
+</div>
