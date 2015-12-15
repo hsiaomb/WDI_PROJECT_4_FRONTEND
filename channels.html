@@ -1,0 +1,2 @@
+<a ui-sref='addChannel'>Start a Channel</a>
+<a ng-repeat="channel in channels.all" ui-sref='channel({ channelId:channel._id })' ng-click="channels.selectChannel(channel._id)"> {{channel.name}}</a>

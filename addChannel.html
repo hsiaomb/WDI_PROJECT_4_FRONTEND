@@ -1,0 +1,11 @@
+<form ng-submit="channels.addChannel()">
+  <div class="field">
+    <label>Channel Name:</label>
+    <input type="text" name="name" placeholder="Channel Name" ng-model="channels.channel.name">
+  </div>
+  <div class="field">
+    <label>Description</label>
+    <textarea type="text" name="description" placeholder="Description" ng-model="channels.channel.description"></textarea>
+  </div>
+  <button type="submit">Start Channel</button>
+</form>

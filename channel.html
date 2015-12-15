@@ -1,14 +1,17 @@
+<h1>{{channels.selectedChannel.channel.name}}</h1>
 <div id="player"></div>
 <ul id="messages">
-  <li ng-repeat="message in users.messages track by $index">{{message}}</li>
+  <li ng-repeat="message in channels.messages track by $index">{{message}}</li>
 </ul>
 
-<form ng-submit="users.sendMessage()">
-  <input name="message" ng-model="users.message.text">
+<form ng-submit="channels.sendMessage()">
+  <input name="message" ng-model="channels.message.text">
   <button>Send</button>
 </form>
 
-<form ng-submit="users.playVideo(users.video.id)">
-  <input name="video" ng-model="users.video.id">
+<form ng-submit="channels.updateCurrentVideo()">
+  <input name="video" ng-model="channels.channel.current_video">
   <button>Send Video</button>
 </form>
+
+<button ng-click="channels.leaveRoom(channels.selectedChannel.channel._id)"> Leave Room </button>
