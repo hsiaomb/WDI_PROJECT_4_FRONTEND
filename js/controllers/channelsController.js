@@ -4,7 +4,7 @@ angular
 
 ChannelsController.$inject = ['Channel', '$scope', '$document', '$window', '$stateParams', 'TokenService', 'YoutubeService'];
 
-function ChannelsController(Channel, $document, $scope, $window, $stateParams, TokenService, YoutubeService) {
+function ChannelsController(Channel, $scope, $document,  $window, $stateParams, TokenService, YoutubeService) {
   var socket = io.connect('http://localhost:3000');
   var self = this;
 
@@ -220,10 +220,11 @@ function ChannelsController(Channel, $document, $scope, $window, $stateParams, T
   self.videos = [];
 
   self.search = function() {
+    console.log('SEARCH');
     YoutubeService.search(self.keyword)
     .then(function(videos) {
       $scope.$evalAsync(function() {
-
+        console.log(videos);
         if(videos.length === 0) {
           self.errorMsg = "No videos were found with the search term '" + self.keyword + "'. Please try again.";
         }
@@ -231,7 +232,7 @@ function ChannelsController(Channel, $document, $scope, $window, $stateParams, T
           self.errorMsg = "";
           self.videos = videos;
         }
-        $document.find('#searchForm')[0].reset();
+        $document.find('form')[0].reset();
       },0);
     });
   };

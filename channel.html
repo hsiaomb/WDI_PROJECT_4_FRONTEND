@@ -32,16 +32,16 @@
 
   <button ng-click="channels.leaveRoom(channels.selectedChannel.channel._id)"> Leave Room </button>
 
-  <form id="searchForm" ng-submit="self.search();">
-    <input name="search" ng-model="self.keyword" placeholder="">
+  <form id="searchForm" ng-submit="channels.search();">
+    <input name="search" ng-model="channels.keyword" placeholder="">
+    <button type="submit"> Search </button>
   </form>
 
-  <p ng-show="!!self.errorMsg">{{self.errorMsg}}</p>
-
+  <p ng-show="!!channels.errorMsg">{{channels.errorMsg}}</p>
   <ul id="results">
-    <li ng-repeat="video in self.videos track by $index">
-    <youtube video="video"></youtube>
-  </li>
+    <li ng-repeat="video in channels.videos track by $index">
+      <youtube video="video"></youtube>
+    </li>
 </ul>
 
 </div>
