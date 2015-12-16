@@ -88,8 +88,6 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
       case YT.PlayerState.ENDED:
       Channel.get({ id: $stateParams.channelId }, function(res){
         if(res.channel.playlist.length > 1){
-          socket.emit('playlistUpdate', $stateParams.channelId);
-          socket.on('playlistUpdate', function(){
             self.selectedChannel.channel.playlist.splice(0,1);
             res.channel.playlist.splice(0,1);
             console.log(res.channel.playlist);
@@ -98,6 +96,21 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
             Channel.update({id: $stateParams.channelId}, newPlaylist, function(newRes){
               console.log(newRes.channel.current_video);
               socket.emit('nextVideo', $stateParams.channelId, newRes.channel.current_video);
+            });
+        } else if(res.channel.playlist.length === 1){
+          self.selectedChannel.channel.playlist.splice(0,1);
+          res.channel.playlist.splice(0,1);
+          console.log(res.channel.playlist);
+          newPlaylist = {playlist: res.channel.playlist, current_video: res.channel.playlist[0]};
+          console.log(newPlaylist);
+          Channel.update({id: $stateParams.channelId}, newPlaylist, function(newRes){
+            console.log(newRes.channel.current_video);
+            socket.emit('stopVideo', $stateParams.channelId);
+            socket.on('stopVideo', function(){
+              self.playerAction('stopVideo');
+              console.log('stopped')
+              self.playerAction('destroy');
+              console.log('cleared')
             });
           });
         }
@@ -180,13 +193,12 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
 
   this.updatePlaylists = function(channelId){
     Channel.get({ id: channelId }, function(res){
-      socket.emit('addToPlaylist', channelId);
-      socket.on('addToPlaylist', function(){
         self.selectedChannel = res;
         self.playlist = self.selectedChannel.channel.playlist;
         self.playlist.push(self.playlistItem);
         self.channel = {playlist: self.playlist};
         Channel.update({id: channelId}, self.channel, function(res){
+          console.log('here');
           if(res.channel.playlist.length === 1){
             self.channel = {current_video: res.channel.playlist[0]};
             Channel.update({id: channelId}, self.channel, function(newRes){
@@ -196,7 +208,6 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
         });
         self.playlist = [];
         self.playlistItem = '';
-      });
     });
   };
 }

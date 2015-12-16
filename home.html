@@ -5,31 +5,6 @@
   <p>Email: {{ user.local.email }}</p>
 </div>
 
-<h1>Register</h1>
-<form ng-submit="users.join()">
-  <div class="field">
-    <label>Username</label>
-    <input type="text" name="username" placeholder="Username" ng-model="users.user.username">
-  </div>
-  <div class="field">
-    <label>Full Name</label>
-    <input type="text" name="fullname" placeholder="Full Name" ng-model="users.user.fullname">
-  </div>
-  <div class="field">
-    <label>Image URL</label>
-    <input type="text" name="image" placeholder="Image URL" ng-model="users.user.image">
-  </div>
-  <div class="field">
-    <label>Email</label>
-    <input type="text" name="email" placeholder="Email" ng-model="users.user.email">
-  </div>
-  <div class="field">
-    <label>Password</label>
-    <input type="password" name="password" placeholder="Password" ng-model="users.user.password">
-  </div>
-  <button type="submit">Register</button>
-</form>
-
 <h1>Login</h1>
 <form ng-submit="users.authorize()">
   <div class="field">
