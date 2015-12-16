@@ -1,0 +1,124 @@
+#playerContainer{
+  width: 100%;
+  height: 400px;
+}
+#chat{
+  height: 175px;
+  width: 544px;
+  float: right;
+  background-color: grey;
+  overflow-y: scroll;
+}
+#chat ul{
+  list-style-type: none;
+  padding-left: 10px
+}
+#player{
+  width: 650px;
+  height: 400px;
+  float:left;
+}
+#playlist{
+  height: 175px;
+  width: 544px;
+  float: right;
+  overflow-y: scroll;
+}
+#newVid{
+  float: right;
+}
+#newVid input{
+  width: 500px;
+}
+#newVid button{
+  width: 40px;
+}
+#chatMessage{
+  float: right;
+}
+#chatMessage button{
+  width: 40px;
+}
+#chatMessage input{
+  width: 500px;
+}
+.clearfix {
+  clear: both;
+}
+
+#query {
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+header {
+  padding: 30px 20px;
+  background: #f4f4f4;
+}
+
+header h1 {
+  color: black;
+  margin-bottom: 5px;
+}
+
+header span {
+  color: #dd2826;
+}
+
+section {
+  padding: 30px 20px 20px 20px;
+}
+
+footer {
+  padding: 20px;
+  background: #f4f4f4;
+  text-align: center;
+}
+
+.fieldcontainer {
+  display: block;
+  position: relative;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.search-field {
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+#results li {
+  padding: 10px 0;
+  border-bottom: 1px dotted #ccc;
+  list-style: none;
+  overflow: auto;
+}
+
+.list-left {
+  float: left;
+  width: 20%;
+}
+
+.list-left img {
+  width: 100%;
+  padding: 3px;
+  border: 1px solid #ccc;
+}
+
+.list-right {
+  float: right;
+  width: 78%;
+}
+
+.list-right h3 {
+  margin: 0;
+  text-decoration: none;
+}
+
+.list-right p {
+  margin: 0;
+}
+
+.Title {
+  color: #333;
+}
