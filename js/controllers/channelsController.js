@@ -2,18 +2,17 @@ angular
 .module('youtubeApp')
 .controller('ChannelsController', ChannelsController);
 
-ChannelsController.$inject = ['Channel','$scope','$window', '$stateParams'];
+ChannelsController.$inject = ['Channel','$scope','$window', '$stateParams', 'TokenService', 'YoutubeService'];
 
-function ChannelsController(Channel, $scope, $window, $stateParams) {
+function ChannelsController(Channel, $document, $scope, $window, $stateParams, TokenService, YoutubeService) {
   var socket = io.connect('http://localhost:3000');
   var self = this;
 
-  this.channel = {current_video: '', secret:''};
+  this.channel = {locked: false};
   self.message = {};
   self.messages = [];
   self.video = {};
   self.player = null;
-  // var playlistItem;
   self.playlist = [];
   Channel.query(function(res){
     self.all = res.channels;
@@ -23,17 +22,8 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
     Channel.get({ id: channelId }, function(res){
       self.selectedChannel = res;
       socket.emit('joinedRoom', $stateParams.channelId);
-      // socket.emit('newUser', $stateParams.channelId);
-      //
-      // socket.on('newUser', function(){
-      //   Channel.get({ id: $stateParams.channelId }, function(res){
-      //     self.playerAction('cueVideoById', {videoID:res.channel.current_video});
-      //     socket.on('newUserCurrentTime', function(time){
-      //       playerAction('seekTo', time);});
-      //     });
-      //   });
-      });
-    };
+    });
+  };
 
   if($stateParams.channelId){
     self.selectChannel($stateParams.channelId);
@@ -148,6 +138,7 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
     $window.location = '#/channels';
   };
 
+
   socket.on('message', function(msg) {
     console.log("Message received");
     $scope.$apply(self.messages.push(msg.text));
@@ -156,16 +147,19 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
 
   this.addChannel = function() {
     Channel.save(self.channel, function(channel) {
+      console.log('SAVED');
       self.all.push(channel);
-      self.channel = {};
+      self.channel = {created_by: TokenService.getUser()._id};
+      Channel.update({id: $stateParams.channelID}, self.channel);
+      self.channel = {locked: false};
       $window.location = '#/channels/' + channel._id;
     });
   };
 
   this.deleteChannel = function(channel){
     Channel.delete({ id: channel._id });
-    var index = self.channels.indexOf(channel);
-    self.channels.splice(index, 1);
+    var index = self.all.indexOf(channel);
+    self.all.splice(index, 1);
   };
 
   this.editChannel = function(channel){
@@ -175,6 +169,17 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
   this.updateCurrentVideo = function(){
     Channel.update({id: $stateParams.channelId}, self.channel, function(res){
       self.playerAction('playVideo', res.channel.current_video);
+    });
+  };
+
+  this.lockRoom = function(channelId){
+    console.log('clicked');
+    console.log(channelId)
+    Channel.get({ id: channelId }, function(res){
+      self.channel = {locked: true};
+      Channel.update({id: channelId}, self.channel, function(res){
+        console.log(res);
+      });
     });
   };
 
@@ -197,6 +202,37 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
         self.playlist = [];
         self.playlistItem = '';
       });
+    });
+  };
+
+  //------------------- YOUTUBE SEARCH FUNCTIONALITY------------------------
+  self.keyword = "";
+  self.errorMsg = "";
+  $window.initGoogleApi = function() {
+    gapi.client.setApiKey("AIzaSyBs4vDfTtUhDGjKd4fqJ2HhcMTcn0HTs78");
+    gapi.client.load('youtube', 'v3').then(function() {
+      $scope.$evalAsync(function() {
+        self.search();
+      },0);
+    });
+  };
+
+  self.videos = [];
+
+  self.search = function() {
+    YoutubeService.search(self.keyword)
+    .then(function(videos) {
+      $scope.$evalAsync(function() {
+
+        if(videos.length === 0) {
+          self.errorMsg = "No videos were found with the search term '" + self.keyword + "'. Please try again.";
+        }
+        else {
+          self.errorMsg = "";
+          self.videos = videos;
+        }
+        $document.find('#searchForm')[0].reset();
+      },0);
     });
   };
 }

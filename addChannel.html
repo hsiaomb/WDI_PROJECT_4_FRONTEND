@@ -7,5 +7,20 @@
     <label>Description</label>
     <textarea type="text" name="description" placeholder="Description" ng-model="channels.channel.description"></textarea>
   </div>
+  <div class="field">
+    <label>Starts in: <i>User's who try to enter the channel after this time, will be locked out</i></label>
+    <select ng-model="channels.lock_time">
+      <option value="1" name="lock_time">1 minute</option>
+      <option value="2" name="lock_time">2 minutes</option>
+      <option value="3" name="lock_time">3 minutes</option>
+      <option value="4" name="lock_time">4 minutes</option>
+      <option value="5" name="lock_time">5 minutes</option>
+      <option value="10" name="lock_time">10 minutes</option>
+      <option value="15" name="lock_time">15 minutes</option>
+      <option value="20" name="lock_time">20 minutes</option>
+      <option value="25" name="lock_time">25 minutes</option>
+      <option value="30" name="lock_time">30 minutes</option>
+    </select>
+  </div>
   <button type="submit">Start Channel</button>
 </form>

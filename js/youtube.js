@@ -49,7 +49,7 @@ function search() {
     '</div>' +
     '<div class="list-right">' +
     '<h3>' + title + '</h3>' +
-    '<p class="cTitle">' + channelTitle + '</p>' +
+    '<p class="cTitle">' + channelTitle + '</p>' + '<button ng-click="updatePlaylists($stateParams.channelId, videoID, title)"> Add to Playlist</button>' +
     '</div>' +
     '</li>' +
     '<div class="clearfix"></div>' +

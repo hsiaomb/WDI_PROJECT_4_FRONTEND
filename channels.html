@@ -1,2 +1,20 @@
 <a ui-sref='addChannel'>Start a Channel</a>
-<a ng-repeat="channel in channels.all" ui-sref='channel({ channelId:channel._id })' ng-click="channels.selectChannel(channel._id)"> {{channel.name}}</a>
+<table>
+  <thead>
+    <td>Title</td>
+    <td>Description</td>
+    <td># of Users</td>
+    <td>Status</td>
+  </thead>
+  <tbody>
+  <tr ng-repeat="channel in channels.all | orderBy:'locked'">
+    <td> {{channel.name}}</td>
+    <td> {{channel.description}}</td>
+    <td> {{channel.users.length}}</td>
+    <td>
+      <button ui-sref='channel({ channelId:channel._id })' ng-if="channel.locked === false">Join Room </button>
+      <span ng-if="channel.locked === true">LOCKED</span>
+    </td>
+  </tr>
+</tbody>
+</table>

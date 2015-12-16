@@ -10,6 +10,10 @@ function onYouTubeIframeAPIReady() {
   console.log("READY CAPTAIN!");
 }
 
+function runGoogleApi() {
+  window.initGoogleApi();
+}
+
 MainRouter.$inject = ['$stateProvider', '$urlRouterProvider'];
 function MainRouter($stateProvider, $urlRouterProvider){
 	$stateProvider
