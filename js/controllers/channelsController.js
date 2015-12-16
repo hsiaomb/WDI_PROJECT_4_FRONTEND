@@ -5,7 +5,7 @@ angular
 ChannelsController.$inject = ['Channel','$scope','$window', '$stateParams'];
 
 function ChannelsController(Channel, $scope, $window, $stateParams) {
-  var socket = io.connect('http://localhost:3000');
+  var socket = io.connect('https://obscure-spire-8949.herokuapp.com');
   var self = this;
 
   this.channel = {current_video: '', secret:''};
