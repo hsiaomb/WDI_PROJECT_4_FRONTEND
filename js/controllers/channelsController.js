@@ -197,6 +197,7 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
         self.playlist = self.selectedChannel.channel.playlist;
         self.playlist.push(self.playlistItem);
         self.channel = {playlist: self.playlist};
+
         Channel.update({id: channelId}, self.channel, function(res){
           console.log('here');
           if(res.channel.playlist.length === 1){
