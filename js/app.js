@@ -10,7 +10,7 @@ function onYouTubeIframeAPIReady() {
   console.log("READY CAPTAIN!");
 }
 
-function runGoogleApi() {
+function initGoogleApi() {
   window.initGoogleApi();
 }
 
