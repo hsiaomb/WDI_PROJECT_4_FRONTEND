@@ -5,7 +5,7 @@ angular
 ChannelsController.$inject = ['Channel','$scope','$window', '$stateParams'];
 
 function ChannelsController(Channel, $scope, $window, $stateParams) {
-  var socket = io.connect('https://obscure-spire-8949.herokuapp.com');
+  var socket = io.connect('http://localhost:3000');
   var self = this;
 
   this.channel = {current_video: '', secret:''};
@@ -22,7 +22,6 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
   self.selectChannel = function(channelId) {
     Channel.get({ id: channelId }, function(res){
       self.selectedChannel = res;
-      var newUserCurrentTime = self.playerAction("getCurrentTime");
       socket.emit('joinedRoom', $stateParams.channelId);
       // socket.emit('newUser', $stateParams.channelId);
       //
@@ -111,6 +110,7 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
       socket.emit('playerState', $stateParams.channelId, YT.PlayerState.PAUSED);
       break;
       case YT.PlayerState.BUFFERING:
+      var currentTime = self.playerAction("getCurrentTime");
       socket.emit('currentTime', $stateParams.channelId, currentTime);
       break;
       case YT.PlayerState.CUED:
