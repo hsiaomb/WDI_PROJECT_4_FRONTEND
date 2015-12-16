@@ -2,7 +2,7 @@ angular
 .module('youtubeApp')
 .controller('ChannelsController', ChannelsController);
 
-ChannelsController.$inject = ['Channel','$scope','$window', '$stateParams', 'TokenService', 'YoutubeService'];
+ChannelsController.$inject = ['Channel', '$scope', '$document', '$window', '$stateParams', 'TokenService', 'YoutubeService'];
 
 function ChannelsController(Channel, $document, $scope, $window, $stateParams, TokenService, YoutubeService) {
   var socket = io.connect('http://localhost:3000');
