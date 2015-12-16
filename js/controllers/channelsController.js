@@ -22,9 +22,19 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
   self.selectChannel = function(channelId) {
     Channel.get({ id: channelId }, function(res){
       self.selectedChannel = res;
+      var newUserCurrentTime = self.playerAction("getCurrentTime");
       socket.emit('joinedRoom', $stateParams.channelId);
-    });
-  };
+      // socket.emit('newUser', $stateParams.channelId);
+      //
+      // socket.on('newUser', function(){
+      //   Channel.get({ id: $stateParams.channelId }, function(res){
+      //     self.playerAction('cueVideoById', {videoID:res.channel.current_video});
+      //     socket.on('newUserCurrentTime', function(time){
+      //       playerAction('seekTo', time);});
+      //     });
+      //   });
+      });
+    };
 
   if($stateParams.channelId){
     self.selectChannel($stateParams.channelId);
@@ -68,11 +78,31 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
     self.playerAction("seekTo", time);
   });
 
+  socket.on('nextVideo', function(video){
+    self.playerAction('cueVideoById', {videoId: video, startSeconds: 0});
+    self.playerAction('playVideo');
+  });
+
 
   function onPlayerStateChange(event) {
     switch(event.data) {
       case YT.PlayerState.ENDED:
-      socket.emit('playerState', $stateParams.channelId, YT.PlayerState.ENDED);
+      Channel.get({ id: $stateParams.channelId }, function(res){
+        if(res.channel.playlist.length > 1){
+          socket.emit('playlistUpdate', $stateParams.channelId);
+          socket.on('playlistUpdate', function(){
+            self.selectedChannel.channel.playlist.splice(0,1);
+            res.channel.playlist.splice(0,1);
+            console.log(res.channel.playlist);
+            newPlaylist = {playlist: res.channel.playlist, current_video: res.channel.playlist[0]};
+            console.log(newPlaylist);
+            Channel.update({id: $stateParams.channelId}, newPlaylist, function(newRes){
+              console.log(newRes.channel.current_video);
+              socket.emit('nextVideo', $stateParams.channelId, newRes.channel.current_video);
+            });
+          });
+        }
+      });
       break;
       case YT.PlayerState.PLAYING:
       socket.emit('playerState', $stateParams.channelId, YT.PlayerState.PLAYING);
@@ -81,8 +111,6 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
       socket.emit('playerState', $stateParams.channelId, YT.PlayerState.PAUSED);
       break;
       case YT.PlayerState.BUFFERING:
-      var currentTime = self.playerAction("getCurrentTime");
-      console.log("in buffering state", currentTime);
       socket.emit('currentTime', $stateParams.channelId, currentTime);
       break;
       case YT.PlayerState.CUED:
@@ -111,9 +139,9 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
     self.iframePlayer(vid);
   });
 
-  self.playVideo = function(vidId){
+  function playVideo(vidId){
     socket.emit('vidId', $stateParams.channelId, vidId);
-  };
+  }
 
   self.leaveRoom = function(id){
     socket.emit('leaveRoom', id);
@@ -146,24 +174,29 @@ function ChannelsController(Channel, $scope, $window, $stateParams) {
 
   this.updateCurrentVideo = function(){
     Channel.update({id: $stateParams.channelId}, self.channel, function(res){
-      self.playVideo(res.channel.current_video);
+      self.playerAction('playVideo', res.channel.current_video);
     });
   };
 
   this.updatePlaylists = function(channelId){
     Channel.get({ id: channelId }, function(res){
-      self.selectedChannel = res;
-      self.playlist = self.selectedChannel.channel.playlist;
-      self.playlist.push(self.playlistItem);
-      self.channel = {playlist: self.playlist};
-      Channel.update({id: channelId}, self.channel, function(res){
-        console.log(res);
-        self.playerAction('cueVideoById', {'videoId': 'bHQqvYy5KYo',
-        'startSeconds': 5
+      socket.emit('addToPlaylist', channelId);
+      socket.on('addToPlaylist', function(){
+        self.selectedChannel = res;
+        self.playlist = self.selectedChannel.channel.playlist;
+        self.playlist.push(self.playlistItem);
+        self.channel = {playlist: self.playlist};
+        Channel.update({id: channelId}, self.channel, function(res){
+          if(res.channel.playlist.length === 1){
+            self.channel = {current_video: res.channel.playlist[0]};
+            Channel.update({id: channelId}, self.channel, function(newRes){
+              playVideo(newRes.channel.current_video);
+            });
+          }
+        });
+        self.playlist = [];
+        self.playlistItem = '';
       });
     });
-    self.playlist = [];
-    self.playlistItem = '';
-  });
-};
+  };
 }
