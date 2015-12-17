@@ -8,7 +8,7 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
   if(!TokenService.getToken()){
     $window.location = "/";
   }
-  var socket = io.connect('http://localhost:3000');
+  var socket = io.connect('https://wetube-api.herokuapp.com');
   var self = this;
 
   this.channel = {locked: false};
