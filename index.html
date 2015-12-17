@@ -39,10 +39,11 @@
   <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <!-- Compiled and minified CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.min.css">
 
   <!-- Compiled and minified JavaScript -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.min.js"></script>
+
 
 </head>
 <body ng-controller="usersController as users">
@@ -62,5 +63,50 @@
 
   <div ui-view>
   </div>
+  <script>
+    $(document).ready(function() {
+      $('.ui.form')
+      .form({
+        fields: {
+          email: {
+            identifier  : 'email',
+            rules: [
+            {
+              type   : 'empty',
+              prompt : 'Please enter your e-mail'
+            },
+            {
+              type   : 'email',
+              prompt : 'Please enter a valid e-mail'
+            }
+            ]
+          },
+          password: {
+            identifier  : 'password',
+            rules: [
+            {
+              type   : 'empty',
+              prompt : 'Please enter your password'
+            },
+            {
+              type   : 'length[6]',
+              prompt : 'Your password must be at least 6 characters'
+            }
+            ]
+          }
+        }
+      })
+      ;
+
+        // fix main menu to page on passing
+        $('.main.menu').visibility({
+          type: 'fixed'
+        });
+        $('.overlay').visibility({
+          type: 'fixed',
+          offset: 80
+        });
+            });
+</script>
 </body>
 </html>
