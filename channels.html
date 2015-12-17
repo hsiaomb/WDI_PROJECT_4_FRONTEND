@@ -1,21 +1,45 @@
 <div class="ui container">
-<table class="ui celled table">
-  <thead>
-    <tr>
-      <th>Channel Name:</th>
-      <th>Description:</th>
-      <th>Status:</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr ng-repeat="channel in channels.all | orderBy:'locked'" ng-class="{'disabled':channel.locked === true}">
-      <td>{{channel.name}}</td>
-      <td>{{channel.description}}</td>
-      <td>
-        <button ng-click="channels.selectChannel(channel._id)" ui-sref="channel({ channelId:channel._id })" ng-if="channel.locked === false">Join</button>
-        <span ng-if="channel.locked === true"> LOCKED </span>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <div id="logout" class="ui animated button" tabindex="0">
+    <div class="visible content">Logout</div>
+    <div class="hidden content" ng-click="users.logout()">
+      <i class="log out icon"></i>
+    </div>
+  </div>
+  <table class="ui celled table" id="allChannels" ng-if="channels.all.length !== 0">
+    <thead>
+      <tr>
+        <td> <div class="ui animated button" tabindex="0">
+          <div class="visible content">Start A Channel</div>
+          <div class="hidden content" ui-sref="addChannel">
+            <i class="film icon"></i>
+          </div>
+        </div> </td>
+      </tr>
+      <tr>
+        <th>Channel Name:</th>
+        <th>Description:</th>
+        <th># of Users:</th>
+        <th>Status:</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="channel in channels.all | orderBy:'locked'" ng-class="{'disabled':channel.locked === true}">
+        <td>{{channel.name}}</td>
+        <td>{{channel.description}}</td>
+        <td>{{channel.users.length}}</td>
+        <td>
+          <div ng-if="channel.locked === false" class="ui animated button" tabindex="0">
+            <div class="visible content">Join Room</div>
+            <div class="hidden content" ng-click="channels.selectChannel(channel._id)" ui-sref="channel({ channelId:channel._id })">
+              <i class="level up icon"></i>
+            </div>
+          </div>
+          <span ng-if="channel.locked === true"><i class="lock icon"></i></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <h1 id="startChannelNotice" ng-if="channels.all.length === 0"> There are currently no channels running! <a ui-sref="addChannel">Start One!</a> </h1>
+  <img class="imageNotice" src="./css/images/uh-oh.png" ng-if="channels.all.length === 0">
+
 </div>

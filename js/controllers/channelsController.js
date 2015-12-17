@@ -5,6 +5,9 @@ angular
 ChannelsController.$inject = ['Channel', '$scope', '$document', '$window', '$stateParams', 'TokenService', 'YoutubeService'];
 
 function ChannelsController(Channel, $scope, $document,  $window, $stateParams, TokenService, YoutubeService) {
+  if(!TokenService.getToken()){
+    $window.location = "/";
+  }
   var socket = io.connect('http://localhost:3000');
   var self = this;
 
@@ -20,19 +23,40 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
   });
 
   self.selectChannel = function(channelId) {
-    console.log('click')
-    console.log(channelId)
     Channel.get({ id: channelId }, function(res){
-      console.log(res)
       self.selectedChannel = res;
-      console.log(self.selectedChannel.channel.name)
+      getUser = TokenService.getUser()._id;
       socket.emit('joinedRoom', $stateParams.channelId);
     });
   };
+  socket.on('joinedRoom', function(){
+    Channel.get({id:$stateParams.channelId}, function(res){
+      self.selectedChannel = res;
+      self.users = self.selectedChannel.channel.users;
+      self.users.push(TokenService.getUser());
+      self.channel = {users: self.users};
+      Channel.update({id:$stateParams.channelId}, self.channel, function(newRes){
+        console.log(newRes);
+      });
+    });
+  });
+  socket.on('leaveRoom', function(){
+    Channel.get({id:$stateParams.channelId}, function(res){
+      self.selectedChannel = res;
+      console.log(self.users, self.selectedChannel.channel.users);
+      self.users = self.selectedChannel.channel.users;
+      index = self.users.indexOf(TokenService.getUser());
+      self.users.splice(index, 1);
+      self.channel = {users: self.users};
+      Channel.update({id:$stateParams.channelId}, self.channel, function(newRes){
+        console.log(newRes);
+      });
+    });
+  })
 
   if($stateParams.channelId){
-   self.selectChannel($stateParams.channelId);
- }
+    self.selectChannel($stateParams.channelId);
+  }
 
   self.playerAction = function(action, arg){
     if(!!self.player && !!self.player[action]){
@@ -45,7 +69,7 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
   };
 
   self.sendMessage = function() {
-    socket.emit('message', $stateParams.channelId, TokenService.getUser().local.username, self.message);
+    socket.emit('message', $stateParams.channelId, TokenService.getUser().local.username, TokenService.getUser().local.image, self.message);
     self.message = "";
   };
 
@@ -79,6 +103,9 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
 
   socket.on('destroyVideo', function(video){
     $scope.$apply(self.playlist.splice(0,1));
+    self.playerAction('destroy');
+    $('playerContainer').append('<div id="player"></div>');
+    self.player = null;
   });
 
   socket.on('nextPlaylist', function(){
@@ -120,8 +147,8 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
     if(!self.player) {
       console.log('INIT PLAYER');
       self.player = new YT.Player('player', {
-        height: '390',
-        width: '640',
+        height: '480',
+        width: '854',
         videoId: vidId,
         events: {
           'onReady': onPlayerReady,
@@ -158,17 +185,17 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
   };
 
 
-  socket.on('message', function(username, msg) {
+  socket.on('message', function(user, img, msg) {
     console.log("Message received");
-    $scope.$apply(self.messages.push({text: msg.text, username: username}));
+    $scope.$apply(self.messages.push({text: msg.text, username: user, image: img}));
     console.log(self.messages);
   });
 
   this.addChannel = function() {
     Channel.save(self.channel, function(channel) {
-      console.log('SAVED');
+      console.log(channel);
       self.all.push(channel);
-      // self.channel = {created_by: TokenService.getUser()._id};
+      self.channel = {users: [TokenService.getUser()], created_by: TokenService.getUser()._id};
       Channel.update({id: $stateParams.channelID}, self.channel);
       self.channel = {locked: false};
       $window.location = '#/channels/' + channel._id;
@@ -185,12 +212,6 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
     self.channel = channel;
   };
 
-  this.updateCurrentVideo = function(){
-    Channel.update({id: $stateParams.channelId}, self.channel, function(res){
-      self.playerAction('playVideo', res.channel.current_video);
-    });
-  };
-
   this.lockRoom = function(channelId){
     console.log('clicked');
     console.log(channelId);
@@ -201,27 +222,6 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
       });
     });
   };
-
-  // this.updatePlaylists = function(channelId){
-  //   Channel.get({ id: channelId }, function(res){
-  //       self.selectedChannel = res;
-  //       self.playlist = self.selectedChannel.channel.playlist;
-  //       self.playlist.push(self.playlistItem);
-  //       self.channel = {playlist: self.playlist};
-  //
-  //       Channel.update({id: channelId}, self.channel, function(res){
-  //         console.log('here');
-  //         if(res.channel.playlist.length === 1){
-  //           self.channel = {current_video: res.channel.playlist[0]};
-  //           Channel.update({id: channelId}, self.channel, function(newRes){
-  //             playVideo(newRes.channel.current_video);
-  //           });
-  //         }
-  //       });
-  //       self.playlist = [];
-  //       self.playlistItem = '';
-  //   });
-  // };
 
   this.updatePlaylists = function(videoId, title, imageUrl){
     updatePlaylist = {videoId: videoId, title: title, image: imageUrl};
@@ -267,4 +267,6 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
       },0);
     });
   };
+
+   $('.commentWrapper').animate({ scrollTop: $(document).height() }, 'slow');
 }

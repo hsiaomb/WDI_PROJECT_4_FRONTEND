@@ -1,3 +1,4 @@
+
 <div class="youtube">
   <div class="list-left">
     <img data-videoId="{{video.videoId}}" ng-src="{{video.imageUrl}}">
@@ -5,7 +6,13 @@
   <div class="list-right">
     <h5>{{video.title}}</h5>
     <p>{{video.description}}</p>
-    <button ng-click="channels.updatePlaylists(video.videoId, video.title, video.imageUrl)"> Add to Playlist</button></div>
+    <div ng-click="channels.updatePlaylists(video.videoId, video.title, video.imageUrl)" class="ui animated button" tabindex="0">
+      <div class="visible content">Add to Playlist</div>
+      <div class="hidden content">
+        <i class="plus square outline icon"></i>
+      </div>
+    </div>
+    <hr>
   </li>
   <div class="clearfix"></div>
 </div>

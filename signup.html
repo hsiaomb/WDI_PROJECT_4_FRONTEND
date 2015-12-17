@@ -1,24 +1,55 @@
-<h1>Register</h1>
-<form ng-submit="users.join()">
-  <div class="field">
-    <label>Username</label>
-    <input type="text" name="username" placeholder="Username" ng-model="users.user.username">
+<div class="ui middle aligned center aligned grid">
+  <div class="column">
+    <h2 class="ui teal image header">
+      <div class="content">
+        <img src="./css/images/logo-wetube.png" id="logo"><br/>
+        Register
+      </div>
+    </h2>
+    <form class="ui large form" ng-submit="users.join()">
+      <div class="ui stacked segment">
+        <div class="field">
+          <div class="ui input">
+            <input type="text" name="fullname" placeholder="Full Name" ng-model="users.user.fullname">
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui input">
+            <input type="text" name="username" placeholder="Username" ng-model="users.user.username">
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui input">
+            <input type="text" name="image" placeholder="Profile Photo URL" ng-model="users.user.image">
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui input">
+            <input type="text" name="email" placeholder="Email" ng-model="users.user.email">
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="lock icon"></i>
+            <input type="password" name="password" ng-model="users.user.password" placeholder="Password" >
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="lock icon"></i>
+            <input type="password" name="_passwordConfirmation" placeholder="Confirm Password" ng-model="users.user._passwordConfirmation">
+          </div>
+        </div>
+        <button type="submit" class="ui fluid large yellow submit button">Register</button>
+      </div>
+
+      <div class="ui error message"></div>
+
+    </form>
+
+    <div class="ui message">
+      <a ui-sref="login">Back to Login</a>
+    </div>
   </div>
-  <div class="field">
-    <label>Full Name</label>
-    <input type="text" name="fullname" placeholder="Full Name" ng-model="users.user.fullname">
-  </div>
-  <div class="field">
-    <label>Image URL</label>
-    <input type="text" name="image" placeholder="Image URL" ng-model="users.user.image">
-  </div>
-  <div class="field">
-    <label>Email</label>
-    <input type="text" name="email" placeholder="Email" ng-model="users.user.email">
-  </div>
-  <div class="field">
-    <label>Password</label>
-    <input type="password" name="password" placeholder="Password" ng-model="users.user.password">
-  </div>
-  <button type="submit">Register</button>
-</form>
+</div>
+</div>

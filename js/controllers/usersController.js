@@ -2,10 +2,12 @@ angular
   .module('youtubeApp')
   .controller('usersController', UsersController);
 
-UsersController.$inject = ['User', 'TokenService', '$scope'];
+UsersController.$inject = ['User', 'TokenService', '$scope', '$window', '$state'];
 
-function UsersController(User, TokenService, $scope) {
-  // place this into a service
+function UsersController(User, TokenService, $scope, $window, $state) {
+  if(!!TokenService.getToken()){
+    $window.location = '#/channels';
+  }
   var self = this;
 
   self.all    = [];
@@ -20,10 +22,10 @@ function UsersController(User, TokenService, $scope) {
     }
 
     self.message = res.message;
+    $window.location = "#/channels";
   }
 
   self.authorize = function() {
-    console.log(self.user);
     User.authorize(self.user, handleLogin);
   };
 
@@ -31,10 +33,11 @@ function UsersController(User, TokenService, $scope) {
     User.join(self.user, handleLogin);
   };
 
-  self.disappear = function() {
+  self.logout = function() {
     TokenService.removeToken();
     self.all = [];
     self.user = {};
+    $window.location = '/';
   };
 
   self.getUsers = function() {

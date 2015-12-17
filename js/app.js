@@ -21,9 +21,9 @@ function initGoogleApi() {
 MainRouter.$inject = ['$stateProvider', '$urlRouterProvider'];
 function MainRouter($stateProvider, $urlRouterProvider){
   $stateProvider
-  .state('home', {
+  .state('login', {
     url: "/",
-    templateUrl: "home.html"
+    templateUrl: "login.html"
   })
   .state('signup', {
     url: '/signup',

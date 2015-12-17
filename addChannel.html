@@ -1,11 +1,37 @@
-<form ng-submit="channels.addChannel()">
-  <div class="field">
-    <label>Channel Name:</label>
-    <input type="text" name="name" placeholder="Channel Name" ng-model="channels.channel.name">
+<div class="ui middle aligned center aligned grid">
+  <div class="column">
+    <h2 class="ui image header">
+      <div class="content">
+        <img src="./css/images/logo-wetube.png" id="logo"><br/>
+        Start a Channel
+      </div>
+    </h2>
+    <form class="ui large form" ng-submit="channels.addChannel()">
+      <div class="ui stacked segment">
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="film icon"></i>
+            <input type="text" name="name" placeholder="Channel Name" ng-model="channels.channel.name">
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <textarea type="text" name="description" placeholder="Description" ng-model="channels.channel.description"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="ui fluid large yellow submit button">Start Channel</button>
+      </div>
+
+      <div class="ui error message"></div>
+
+    </form>
+
+    <div class="ui message">
+      <a ui-sref="channels">Back to Channels</a>
+    </div>
+    <div class="ui message">
+      <a ng-click="users.logout()">Logout</a>
+    </div>
   </div>
-  <div class="field">
-    <label>Description</label>
-    <textarea type="text" name="description" placeholder="Description" ng-model="channels.channel.description"></textarea>
-  </div>
-  <button type="submit">Start Channel</button>
-</form>
+</div>
+</div>
