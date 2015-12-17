@@ -1,39 +1,75 @@
-      <h3>{{channels.selectedChannel.channel.name}}</h3>
-      <button ng-click="channels.leaveRoom(channels.selectedChannel.channel._id)"> Leave Room </button>
-      <button ng-click="channels.lockRoom(channels.selectedChannel.channel._id)"> LOCK ROOM </button>
+<div class="ui container">
+  <div class="row">
+    <div class="ui blue segment">
+      <h3>{{channels.selectedChannel.channel.name}}</h3><br>
+      Channel Description:<br/>
+      <p><i>{{channels.selectedChannel.channel.description}}</i></p></span>
+    </div>
 
-      <div id="playerContainer">
-        <div id="player"></div>
+    <button ng-click="channels.leaveRoom(channels.selectedChannel.channel._id)"> Leave Room </button>
+    <button ng-if="getUser === channels.selectedChannel.channel.created_by" ng-click="channels.lockRoom(channels.selectedChannel.channel._id)"> LOCK ROOM </button>
+    <div id="theater">
+      <div class="ui text container">
+        <div id="playerContainer">
+          <h1 ng-if="channels.selectedChannel.channel.locked === false">Waiting for Users to Join...</h1>
+          <div id="player"></div>
+        </div>
       </div>
+    </div>
+  </div>
 
-      <div id="chat">
-        <ul id="messages">
-          <li ng-repeat="message in channels.messages track by $index">{{message.username}}: {{message.text}}</li>
-        </ul>
-      </div>
-      <form id="chatMessage" ng-submit="channels.sendMessage()">
-        <input id="message" name="message" ng-model="channels.message.text">
-        <button>Send</button>
-      </form>
-
-      <ul id="upNext">
-        <li ng-repeat="playlist in channels.playlist track by $index">
-          <img ng-src="{{playlist.image}}"> - {{playlist.title}}
-        </li>
-      </ul>
-
-
-    <form id="newVid" ng-submit="channels.search();">
-     <div class="input-field col s12">
-       <i class="material-icons prefix">search</i>
-       <input name="search" ng-model="channels.keyword" placeholder="">
-     </div>
-   </form>
-   <div id="playlist">
-    <ul id="results">
-      <p ng-show="!!channels.errorMsg">{{channels.errorMsg}}</p>
-      <li ng-repeat="video in channels.videos track by $index">
-        <youtube video="video"></youtube>
+  <div class="row" id="upnextPlaylist" ng-class="height:100px:channels.playlist.length > 1">
+    <ul id="upNext">
+      <li ng-repeat="playlist in channels.playlist track by $index">
+        <div class="playlistItem">
+          <div class="leftImg">
+            <img ng-src="{{playlist.image}}">
+          </div>
+          <div class="rightContent">
+            <p>{{playlist.title}}</p>
+          </div>
+        </div>
       </li>
     </ul>
   </div>
+
+  <div class="ui comments" id="messages">
+    <h3 class="ui dividing header">Messages</h3>
+    <div class="comment" ng-repeat="message in channels.messages track by $index">
+      <a class="avatar">
+        <img ng-src="{{message.image}}">
+      </a>
+      <div class="content">
+        <a class="author">{{message.username}}</a>
+        <div class="text">
+          {{message.text}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <div id="chat">
+  <ul id="messages">
+  <li ng-repeat="message in channels.messages track by $index">{{message.username}}: {{message.text}}</li>
+</ul>
+</div> -->
+<form id="chatMessage" ng-submit="channels.sendMessage()">
+  <input id="message" name="message" ng-model="channels.message.text">
+  <button>Send</button>
+</form>
+
+
+<form id="newVid" ng-submit="channels.search();">
+  <div class="input-field col s12">
+    <i class="material-icons prefix">search</i>
+    <input name="search" ng-model="channels.keyword" placeholder="">
+  </div>
+</form>
+<div id="playlist">
+  <ul id="results">
+    <p ng-show="!!channels.errorMsg">{{channels.errorMsg}}</p>
+    <li ng-repeat="video in channels.videos track by $index">
+      <youtube video="video"></youtube>
+    </li>
+  </ul>
+</div>
+</div>
