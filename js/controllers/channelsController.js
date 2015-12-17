@@ -14,34 +14,39 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
   self.video = {};
   self.player = null;
   self.playlist = [];
+  self.users = [];
   Channel.query(function(res){
     self.all = res.channels;
   });
 
   self.selectChannel = function(channelId) {
+    console.log('click')
+    console.log(channelId)
     Channel.get({ id: channelId }, function(res){
+      console.log(res)
       self.selectedChannel = res;
+      console.log(self.selectedChannel.channel.name)
       socket.emit('joinedRoom', $stateParams.channelId);
     });
   };
 
   if($stateParams.channelId){
-    self.selectChannel($stateParams.channelId);
-  }
+   self.selectChannel($stateParams.channelId);
+ }
 
-  self.playerAction = function(action){
+  self.playerAction = function(action, arg){
     if(!!self.player && !!self.player[action]){
-      if(arguments.length == 1){
+      if(!arg){
         return self.player[action]();
       } else{
-        return self.player[action](arguments[1]);
+        return self.player[action](arg);
       }
-
     }
   };
 
   self.sendMessage = function() {
-    socket.emit('message', $stateParams.channelId, self.message);
+    socket.emit('message', $stateParams.channelId, TokenService.getUser().local.username, self.message);
+    self.message = "";
   };
 
   socket.on('playerState', function(state) {
@@ -55,10 +60,10 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
         self.playerAction("pauseVideo");
         console.log('Pause Video');
         break;
-        case 3:
-        self.playerAction("pauseVideo");
-        console.log('Pause Video');
-        break;
+        // case 3:
+        // self.playerAction("pauseVideo");
+        // console.log('Pause Video');
+        // break;
       }
     }
   });
@@ -72,39 +77,24 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
     self.playerAction('playVideo');
   });
 
+  socket.on('destroyVideo', function(video){
+    $scope.$apply(self.playlist.splice(0,1));
+  });
+
+  socket.on('nextPlaylist', function(){
+    $scope.$apply(self.playlist.splice(0,1));
+    console.log(self.playlist);
+    socket.emit('nextVideo', $stateParams.channelId, self.playlist[0].videoId);
+  });
 
   function onPlayerStateChange(event) {
     switch(event.data) {
       case YT.PlayerState.ENDED:
-      Channel.get({ id: $stateParams.channelId }, function(res){
-        if(res.channel.playlist.length > 1){
-            self.selectedChannel.channel.playlist.splice(0,1);
-            res.channel.playlist.splice(0,1);
-            console.log(res.channel.playlist);
-            newPlaylist = {playlist: res.channel.playlist, current_video: res.channel.playlist[0]};
-            console.log(newPlaylist);
-            Channel.update({id: $stateParams.channelId}, newPlaylist, function(newRes){
-              console.log(newRes.channel.current_video);
-              socket.emit('nextVideo', $stateParams.channelId, newRes.channel.current_video);
-            });
-        } else if(res.channel.playlist.length === 1){
-          self.selectedChannel.channel.playlist.splice(0,1);
-          res.channel.playlist.splice(0,1);
-          console.log(res.channel.playlist);
-          newPlaylist = {playlist: res.channel.playlist, current_video: res.channel.playlist[0]};
-          console.log(newPlaylist);
-          Channel.update({id: $stateParams.channelId}, newPlaylist, function(newRes){
-            console.log(newRes.channel.current_video);
-            socket.emit('stopVideo', $stateParams.channelId);
-            socket.on('stopVideo', function(){
-              self.playerAction('stopVideo');
-              console.log('stopped')
-              self.playerAction('destroy');
-              console.log('cleared')
-            });
-          });
-        }
-      });
+      if(self.playlist.length > 1){
+        socket.emit('nextPlaylist', $stateParams.channelId);
+      } else if(self.playlist.length === 1){
+        socket.emit('destroyVideo', $stateParams.channelId);
+      }
       break;
       case YT.PlayerState.PLAYING:
       socket.emit('playerState', $stateParams.channelId, YT.PlayerState.PLAYING);
@@ -127,19 +117,35 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
   }
 
   self.iframePlayer = function(vidId){
-    self.player = new YT.Player('player', {
-      height: '390',
-      width: '640',
-      videoId: vidId,
-      events: {
-        'onReady': onPlayerReady,
-        'onStateChange': onPlayerStateChange
-      }
-    });
+    if(!self.player) {
+      console.log('INIT PLAYER');
+      self.player = new YT.Player('player', {
+        height: '390',
+        width: '640',
+        videoId: vidId,
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
   };
 
   socket.on('vidId', function(vid) {
     self.iframePlayer(vid);
+  });
+
+  socket.on('playlistUpdated', function(playlist){
+    console.log("Video received");
+    $scope.$apply(self.playlist.push(playlist));
+    console.log(self.playlist[0].videoId);
+    console.log(self.playlist);
+    if(self.playlist.length === 1){
+      playVideo(self.playlist[0].videoId);
+    }
+    // }else if(e){
+    //   socket.emit('nextVideo', $stateParams.channelId, self.playlist[0].videoId);
+    // }
   });
 
   function playVideo(vidId){
@@ -152,17 +158,17 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
   };
 
 
-  socket.on('message', function(msg) {
+  socket.on('message', function(username, msg) {
     console.log("Message received");
-    $scope.$apply(self.messages.push(msg.text));
-    console.log(self.messages.length);
+    $scope.$apply(self.messages.push({text: msg.text, username: username}));
+    console.log(self.messages);
   });
 
   this.addChannel = function() {
     Channel.save(self.channel, function(channel) {
       console.log('SAVED');
       self.all.push(channel);
-      self.channel = {created_by: TokenService.getUser()._id};
+      // self.channel = {created_by: TokenService.getUser()._id};
       Channel.update({id: $stateParams.channelID}, self.channel);
       self.channel = {locked: false};
       $window.location = '#/channels/' + channel._id;
@@ -187,7 +193,7 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
 
   this.lockRoom = function(channelId){
     console.log('clicked');
-    console.log(channelId)
+    console.log(channelId);
     Channel.get({ id: channelId }, function(res){
       self.channel = {locked: true};
       Channel.update({id: channelId}, self.channel, function(res){
@@ -196,37 +202,50 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
     });
   };
 
-  this.updatePlaylists = function(channelId){
-    Channel.get({ id: channelId }, function(res){
-        self.selectedChannel = res;
-        self.playlist = self.selectedChannel.channel.playlist;
-        self.playlist.push(self.playlistItem);
-        self.channel = {playlist: self.playlist};
+  // this.updatePlaylists = function(channelId){
+  //   Channel.get({ id: channelId }, function(res){
+  //       self.selectedChannel = res;
+  //       self.playlist = self.selectedChannel.channel.playlist;
+  //       self.playlist.push(self.playlistItem);
+  //       self.channel = {playlist: self.playlist};
+  //
+  //       Channel.update({id: channelId}, self.channel, function(res){
+  //         console.log('here');
+  //         if(res.channel.playlist.length === 1){
+  //           self.channel = {current_video: res.channel.playlist[0]};
+  //           Channel.update({id: channelId}, self.channel, function(newRes){
+  //             playVideo(newRes.channel.current_video);
+  //           });
+  //         }
+  //       });
+  //       self.playlist = [];
+  //       self.playlistItem = '';
+  //   });
+  // };
 
-        Channel.update({id: channelId}, self.channel, function(res){
-          console.log('here');
-          if(res.channel.playlist.length === 1){
-            self.channel = {current_video: res.channel.playlist[0]};
-            Channel.update({id: channelId}, self.channel, function(newRes){
-              playVideo(newRes.channel.current_video);
-            });
-          }
-        });
-        self.playlist = [];
-        self.playlistItem = '';
-    });
+  this.updatePlaylists = function(videoId, title, imageUrl){
+    updatePlaylist = {videoId: videoId, title: title, image: imageUrl};
+    socket.emit('updatePlaylist', $stateParams.channelId, updatePlaylist);
   };
 
   //------------------- YOUTUBE SEARCH FUNCTIONALITY------------------------
   self.keyword = "";
   self.errorMsg = "";
-  $window.initGoogleApi = function() {
+
+  function goGoGoogle() {
+    console.log('Calling API');
     gapi.client.setApiKey("AIzaSyBs4vDfTtUhDGjKd4fqJ2HhcMTcn0HTs78");
     gapi.client.load('youtube', 'v3').then(function() {
       $scope.$evalAsync(function() {
         self.search();
       },0);
     });
+  }
+
+  if(gApiLoaded) { goGoGoogle(); }
+
+  $window.runGoogleApi = function(){
+    goGoGoogle();
   };
 
   self.videos = [];
@@ -244,7 +263,7 @@ function ChannelsController(Channel, $scope, $document,  $window, $stateParams, 
           self.errorMsg = "";
           self.videos = videos;
         }
-        $document.find('form')[0].reset();
+        $('#newVid')[0].reset();
       },0);
     });
   };

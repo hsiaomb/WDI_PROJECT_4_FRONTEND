@@ -3,11 +3,9 @@
     <img data-videoId="{{video.videoId}}" ng-src="{{video.imageUrl}}">
   </div>
   <div class="list-right">
-    <h3>{{video.title}}</h3>
-    <p class="cTitle">{{video.title}}</p>
-    <p>{{video.date}}</p>
+    <h5>{{video.title}}</h5>
     <p>{{video.description}}</p>
-    <button ng-click="updatePlaylists($stateParams.channelId, videoID, title)"> Add to Playlist</button></div>
+    <button ng-click="channels.updatePlaylists(video.videoId, video.title, video.imageUrl)"> Add to Playlist</button></div>
   </li>
   <div class="clearfix"></div>
 </div>

@@ -1,1 +1,21 @@
-<a ng-repeat="channel in channels.all" ui-sref='channel({ channelId:channel._id })' ng-click="channels.selectChannel(channel._id)"> {{channel.name}}</a>
+<div class="ui container">
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Channel Name:</th>
+      <th>Description:</th>
+      <th>Status:</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="channel in channels.all | orderBy:'locked'" ng-class="{'disabled':channel.locked === true}">
+      <td>{{channel.name}}</td>
+      <td>{{channel.description}}</td>
+      <td>
+        <button ng-click="channels.selectChannel(channel._id)" ui-sref="channel({ channelId:channel._id })" ng-if="channel.locked === false">Join</button>
+        <span ng-if="channel.locked === true"> LOCKED </span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>

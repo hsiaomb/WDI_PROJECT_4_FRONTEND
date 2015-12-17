@@ -10,8 +10,12 @@ function onYouTubeIframeAPIReady() {
   console.log("READY CAPTAIN!");
 }
 
+var gApiLoaded = false;
 function initGoogleApi() {
-  window.initGoogleApi();
+  gApiLoaded = true;
+  if(window.runGoogleApi) {
+    window.runGoogleApi();
+  }
 }
 
 MainRouter.$inject = ['$stateProvider', '$urlRouterProvider'];
