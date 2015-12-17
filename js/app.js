@@ -1,6 +1,6 @@
 angular
 .module('youtubeApp', ['angular-jwt', 'ngResource', 'ui.router'])
-.constant('API', 'https://wetube-api.herokuapp.com//api')
+.constant('API', 'https://wetube-api.herokuapp.com/api')
 .config(function($httpProvider) {
   $httpProvider.interceptors.push('AuthInterceptor');
 })
